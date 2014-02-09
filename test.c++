@@ -49,9 +49,8 @@ int main()
          /*XXX "int " ?*/ "main(" /*XXX "int argc, char* argv[]" ?*/ ")\n");
 
     test("Inside function - edge case, on closing brace",
-            "int main(int argc, char* argv[])\n"
-            "{ return 0; HERE>}\n",
-         /*XXX "int " ?*/ "main(" /*XXX "int argc, char* argv[]" ?*/ ")\n");
+            "int main() { return 0; HERE>}\n",
+         "main()\n");
 
     test("Inside function - second function definition",
             "void fn1() { }\n"
