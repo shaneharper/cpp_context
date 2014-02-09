@@ -1,4 +1,4 @@
-cpp_context
+C++ Context
 ===========
 
-Output "context" (namespace / class / function) for a location in a C++ source file
+C++ Context takes as input a position in a C++ source file and outputs the corresponding "context", viz. the scope (namespace, class, and/or function).
