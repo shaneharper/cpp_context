@@ -37,7 +37,6 @@ namespace Libclang
     using TranslationUnitContext = Index;
 
 
-
     class TranslationUnit
     {
         CXTranslationUnit translation_unit;
