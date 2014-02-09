@@ -25,9 +25,14 @@ std::string get_context(const char* source_code, size_t query_offset)
                     return Libclang::NextNode::None;
                 }
 
-                if (CXCursor_FunctionDecl == clang_getCursorKind(cursor))
+                const auto cursor_kind = clang_getCursorKind(cursor);
+                if (CXCursor_FunctionDecl == cursor_kind)
                 {
                     result += Libclang::get(source_code, clang_Cursor_getSpellingNameRange(cursor, 0, 0)) + "()\n";
+                }
+                else if (CXCursor_Namespace == cursor_kind)
+                {
+                    result += "namespace " + Libclang::get(source_code, clang_Cursor_getSpellingNameRange(cursor, 0, 0)) + "\n";
                 }
                 return Libclang::NextNode::Child;
             });

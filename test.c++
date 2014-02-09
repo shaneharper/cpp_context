@@ -60,6 +60,15 @@ int main()
             "void fn2() { }\n",
          "main()\n");
 
+    test("namespace",
+            "namespace MyNamespace\n"
+            "{\n"
+            "   void doit()\n"
+            "   {HERE> }\n"
+            "}\n",
+         "namespace MyNamespace\n"
+         "doit()\n");
+
 
     if (num_test_failures == 0)
     {
