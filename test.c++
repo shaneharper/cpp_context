@@ -48,7 +48,12 @@ int main()
             "{HERE> return 0; }\n",
          /*XXX "int " ?*/ "main(" /*XXX "int argc, char* argv[]" ?*/ ")\n");
 
-    test("Inside function - Second function definition",
+    test("Inside function - edge case, on closing brace",
+            "int main(int argc, char* argv[])\n"
+            "{ return 0; HERE>}\n",
+         /*XXX "int " ?*/ "main(" /*XXX "int argc, char* argv[]" ?*/ ")\n");
+
+    test("Inside function - second function definition",
             "void fn1() { }\n"
             "int main()\n"
             "{HERE> return 0; }\n"
