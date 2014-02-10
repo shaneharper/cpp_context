@@ -2,18 +2,12 @@
 #include <cstring> // strlen
 
 
-std::string get_context(const char* source_code, size_t query_offset)
+static std::string get_context(const CXCursor& cursor, const size_t query_offset)
 {
-    Libclang::TranslationUnitContext translation_unit_context;
-    Libclang::TranslationUnit translation_unit(translation_unit_context, "test.c++",
-            /*command_line_args*/ {},
-            /*unsaved_files*/ {{"test.c++", source_code, strlen(source_code)}},
-            /*options*/ CXTranslationUnit_None);
-
     std::string result;
 
-    Libclang::visit_children(translation_unit.get_cursor(),
-            [source_code, query_offset, &result](const CXCursor& cursor, const CXCursor& /*parent*/)
+    Libclang::visit_children(cursor,
+            [query_offset, &result](const CXCursor& cursor, const CXCursor& /*parent*/)
             {
                 const auto cursor_extent = clang_getCursorExtent(cursor);
                 if (Libclang::get_end_offset(cursor_extent) < query_offset)
@@ -28,14 +22,25 @@ std::string get_context(const char* source_code, size_t query_offset)
                 const auto cursor_kind = clang_getCursorKind(cursor);
                 if (CXCursor_FunctionDecl == cursor_kind)
                 {
-                    result += Libclang::get_cursor_display_name(cursor) + "\n";
+                    result += Libclang::get_display_name(cursor) + "\n";
                 }
                 else if (CXCursor_Namespace == cursor_kind)
                 {
-                    result += "namespace " + Libclang::get_cursor_display_name(cursor) + "\n";
+                    result += "namespace " + Libclang::get_display_name(cursor) + "\n";
                 }
                 return Libclang::NextNode::Child;
             });
 
     return result;
+}
+
+std::string get_context(const char* source_code, const size_t query_offset)
+{
+    Libclang::TranslationUnitContext translation_unit_context;
+    Libclang::TranslationUnit translation_unit(translation_unit_context, "test.c++",
+            /*command_line_args*/ {},
+            /*unsaved_files*/ {{"test.c++", source_code, strlen(source_code)}},
+            /*options*/ CXTranslationUnit_None);
+
+    return get_context(translation_unit.get_cursor(), query_offset);
 }

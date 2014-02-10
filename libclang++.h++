@@ -109,7 +109,7 @@ namespace Libclang
             &function);
     }
 
-    String get_cursor_display_name(const CXCursor& cursor)
+    String get_display_name(const CXCursor& cursor)
     {
         return clang_getCursorDisplayName(cursor);
     }
