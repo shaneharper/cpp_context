@@ -2,7 +2,7 @@
 #include <cstring> // strlen
 
 
-static std::string get_context(const CXCursor& cursor, const size_t query_offset)
+std::string get_context(const CXCursor& cursor, const size_t query_offset)
 {
     std::string result;
 
@@ -32,15 +32,4 @@ static std::string get_context(const CXCursor& cursor, const size_t query_offset
             });
 
     return result;
-}
-
-std::string get_context(const char* source_code, const size_t query_offset)
-{
-    Libclang::TranslationUnitContext translation_unit_context;
-    Libclang::TranslationUnit translation_unit(translation_unit_context, "test.c++",
-            /*command_line_args*/ {},
-            /*unsaved_files*/ {{"test.c++", source_code, strlen(source_code)}},
-            /*options*/ CXTranslationUnit_None);
-
-    return get_context(translation_unit.get_cursor(), query_offset);
 }

@@ -1,9 +1,22 @@
+#include "libclang++.h++"
 #include <cstring> // strlen
 #include <iostream>
 #include <string>
 
 
 static unsigned num_test_failures = 0;
+
+static std::string get_context(const char* source_code, const size_t query_offset)
+{
+    Libclang::TranslationUnitContext translation_unit_context;
+    Libclang::TranslationUnit translation_unit(translation_unit_context, "unsaved.c++",
+            /*command_line_args*/ {},
+            /*unsaved_files*/ {{"unsaved.c++", source_code, strlen(source_code)}},
+            /*options*/ CXTranslationUnit_None);
+
+    return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
+        : get_context(translation_unit.get_cursor(), query_offset);
+}
 
 void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,
@@ -43,6 +56,7 @@ int main()
             "\nint main() { }\nHERE>\n",
          "");
 
+
     test("Inside function",
             "int main(int argc, char* argv[])\n"
             "{HERE> return 0; }\n",
@@ -58,6 +72,7 @@ int main()
             "{HERE> return 0; }\n"
             "void fn2() { }\n",
          "main()\n");
+
 
     test("namespace",
             "namespace MyNamespace\n"

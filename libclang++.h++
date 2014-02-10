@@ -1,5 +1,7 @@
 // C++ classes and utility functions built upon the C libclang API.
 
+#pragma once
+
 #include <clang-c/Index.h>
 #include <stdexcept>
 #include <vector>
@@ -12,7 +14,7 @@ namespace Libclang
         CXIndex index;
       public:
         Index(bool exclude_declarations_from_PCH = true, bool display_diagnostics = true)
-          : index(clang_createIndex(exclude_declarations_from_PCH, display_diagnostics))
+          : index{clang_createIndex(exclude_declarations_from_PCH, display_diagnostics)}
         {
             if (!index)
             {
@@ -47,11 +49,11 @@ namespace Libclang
                 const std::vector<const char*>& command_line_args,
                 /*const*/ std::vector<CXUnsavedFile> unsaved_files /* contents and filenames as specified by CXUnsavedFile are copied when necessary - client only needs to guarantee their validity until the call to this function returns. */,
                 unsigned /*See enum CXTranslationUnit_Flags*/ options)
-          : translation_unit(clang_parseTranslationUnit(
+          : translation_unit{clang_parseTranslationUnit(
                       translation_unit_context, source_filename,
                       command_line_args.data(), command_line_args.size(),
                       unsaved_files.data(), unsaved_files.size(),
-                      options))
+                      options)}
         {
             if (!translation_unit)
             {
@@ -67,7 +69,7 @@ namespace Libclang
         TranslationUnit(const TranslationUnit&) = delete;
         TranslationUnit& operator=(const TranslationUnit&) = delete;
 
-//        operator CXTranslationUnit() { return translation_unit; }
+        operator CXTranslationUnit() { return translation_unit; }
 
         CXCursor get_cursor() const
         {
