@@ -93,6 +93,11 @@ int main()
             "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
          "fn(const T &)\n");
 
+    test("lambda function",
+            "int main()\n"
+            "{ auto f = [](bool){ HERE>return 42; }; }\n",
+          "main()\n[]"/*XXX bool */"\n");
+
 
     test("namespace",
             "namespace MyNamespace\n"

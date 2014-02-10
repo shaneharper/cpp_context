@@ -20,7 +20,8 @@ static std::string scope_name(const CXCursor& cursor)
         { CXCursor_ConversionFunction,  ""},
         { CXCursor_FunctionTemplate,    ""},
         { CXCursor_ClassTemplate,       template_class_or_struct_or_union},
-        { CXCursor_ClassTemplatePartialSpecialization, template_class_or_struct_or_union}
+        { CXCursor_ClassTemplatePartialSpecialization, template_class_or_struct_or_union},
+        { CXCursor_LambdaExpr,          "[]"}
     };
     auto it = cursor_kinds_that_introduce_a_named_scope.find(clang_getCursorKind(cursor));
     if (it != cursor_kinds_that_introduce_a_named_scope.end())
