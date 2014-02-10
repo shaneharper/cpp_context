@@ -10,7 +10,7 @@ std::string get_context(const CXCursor& cursor, const size_t query_offset)
             [query_offset, &result](const CXCursor& cursor, const CXCursor& /*parent*/)
             {
                 const auto cursor_extent = clang_getCursorExtent(cursor);
-                if (Libclang::get_end_offset(cursor_extent) < query_offset)
+                if (Libclang::get_one_beyond_end_offset(cursor_extent) <= query_offset)
                 {
                     return Libclang::NextNode::Sibling;
                 }

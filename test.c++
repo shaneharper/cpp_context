@@ -53,7 +53,7 @@ int main()
          "");
 
     test("Global scope - after a function",
-            "\nint main() { }\nHERE>\n",
+            "\nint main() { }HERE>\n\n",
          "");
 
 

@@ -129,7 +129,7 @@ namespace Libclang
         return get_offset(clang_getRangeStart(extent));
     }
 
-    size_t get_end_offset(const CXSourceRange& extent)
+    size_t get_one_beyond_end_offset(const CXSourceRange& extent)
     {
         return get_offset(clang_getRangeEnd(extent));
     }
