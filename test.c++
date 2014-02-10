@@ -10,7 +10,7 @@ static std::string get_context(const char* source_code, const size_t query_offse
 {
     Libclang::TranslationUnitContext translation_unit_context;
     Libclang::TranslationUnit translation_unit(translation_unit_context, "unsaved.c++",
-            /*command_line_args*/ {},
+            /*command_line_args*/ {"-std=c++11"},
             /*unsaved_files*/ {{"unsaved.c++", source_code, strlen(source_code)}},
             /*options*/ CXTranslationUnit_None);
 
@@ -57,21 +57,41 @@ int main()
          "");
 
 
-    test("Inside function",
+    test("function",
             "int main(int argc, char* argv[])\n"
             "{HERE> return 0; }\n",
          /*XXX "int " ?*/ "main(int, char **)\n");
 
-    test("Inside function - edge case, on closing brace",
+    test("function - edge case, on closing brace",
             "int main() { return 0; HERE>}\n",
          "main()\n");
 
-    test("Inside function - second function definition",
+    test("function - second function definition",
             "void fn1() { }\n"
             "int main()\n"
             "{HERE> return 0; }\n"
             "void fn2() { }\n",
          "main()\n");
+
+    test("member function",
+            "struct S { void doit() { HERE>; } };\n",
+         "struct S\ndoit()\n");
+
+    test("constructor",
+            "struct S { int i; S(int i) : i(i) { HERE>; } };\n",
+         "struct S\nS(int)\n");
+
+    test("destructor",
+            "struct S {  ~S() { HERE>; } };\n",
+         "struct S\n~S()\n");
+
+    test("conversion function",
+            "struct S { operator int() { HERE>return 42; } };\n",
+         "struct S\noperator int()\n");
+
+    test("template function",
+            "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
+         "fn(const T &)\n");
 
 
     test("namespace",
@@ -82,6 +102,53 @@ int main()
             "}\n",
          "namespace MyNamespace\n"
          "doit()\n");
+
+
+    test("class",
+            "class X\n"
+            "{\n"
+            "   int secret;\n"
+            "  HERE>public: X();\n"
+            "};\n",
+         "class X\n");
+
+    test("template class",
+            "template<typename T> class C { public: HERE>T v; };\n",
+          "class C<T>\n");
+
+    test("struct",
+            "struct X {HERE> X(); };\n",
+         "struct X\n");
+
+    test("template struct",
+            "template<typename T> struct S { HERE>T v; };\n",
+          "struct S<T>\n");
+
+    test("template specialization",
+            "template<typename T> struct S { int doit() { return 1; } };\n"
+            "template<> struct S<bool> { int doit() { return 2; }HERE> };\n",
+         "struct S<bool>\n");
+
+    test("partial template specialization",
+            "template<typename T> struct S { int doit() { return 1; } };\n"
+            "template<typename T> struct S<T *> { int doit() { return 2; } HERE> };\n",
+         "struct S<T *>\n");
+
+    test("union",
+            "union U { short s; HERE>long l; };\n",
+         "union U\n");
+
+    test("template union",
+            "template<typename T> union U { HERE>T v; bool b; };\n",
+          "union U<T>\n");
+
+    test("enum",
+            "enum E { ONE, TWO, HERE>THREE };\n",
+         "enum E\n");
+
+    test("enum class",
+            "enum class E : char { ONE, TWO, HERE>THREE };\n",
+         "enum E\n");
 
 
     if (num_test_failures == 0)
