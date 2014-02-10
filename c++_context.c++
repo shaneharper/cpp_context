@@ -28,11 +28,11 @@ std::string get_context(const char* source_code, size_t query_offset)
                 const auto cursor_kind = clang_getCursorKind(cursor);
                 if (CXCursor_FunctionDecl == cursor_kind)
                 {
-                    result += Libclang::get(source_code, clang_Cursor_getSpellingNameRange(cursor, 0, 0)) + "()\n";
+                    result += Libclang::get_cursor_display_name(cursor) + "\n";
                 }
                 else if (CXCursor_Namespace == cursor_kind)
                 {
-                    result += "namespace " + Libclang::get(source_code, clang_Cursor_getSpellingNameRange(cursor, 0, 0)) + "\n";
+                    result += "namespace " + Libclang::get_cursor_display_name(cursor) + "\n";
                 }
                 return Libclang::NextNode::Child;
             });

@@ -76,6 +76,22 @@ namespace Libclang
     };
 
 
+    class String
+    {
+        CXString string;
+      public:
+        String(const CXString& string) : string(string) { }
+        ~String()
+        {
+            clang_disposeString(string);
+        }
+        operator const char*() const
+        {
+            return clang_getCString(string);
+        }
+    };
+
+
     enum class NextNode { None = CXChildVisit_Break,
                           Sibling /*without visiting current node's children*/ = CXChildVisit_Continue,
                           Child = CXChildVisit_Recurse };
@@ -91,6 +107,11 @@ namespace Libclang
                 return static_cast<CXChildVisitResult>(next_node);
             },
             &function);
+    }
+
+    String get_cursor_display_name(const CXCursor& cursor)
+    {
+        return clang_getCursorDisplayName(cursor);
     }
 
 
@@ -111,10 +132,12 @@ namespace Libclang
         return get_offset(clang_getRangeEnd(extent));
     }
 
-    std::string get(const char* source_code, const CXSourceRange& extent)
+    std::string operator+(const String& s, const char* t)
     {
-        const size_t start_offset {get_offset(clang_getRangeStart(extent))};
-        return {source_code + start_offset,
-                get_offset(clang_getRangeEnd(extent)) - start_offset};
+        return static_cast<const char*>(s) + std::string{t};
+    }
+    std::string operator+(const char* s, const String& t)
+    {
+        return std::string{s} + static_cast<const char*>(t);
     }
 }
