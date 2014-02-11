@@ -156,6 +156,12 @@ int main()
          "enum E\n");
 
 
+    test("include file",
+            "#include <iostream>\n"
+            "int main() { HERE>; }\n",
+         "main()\n");
+
+
     if (num_test_failures == 0)
     {
         std::cout << "Ok" << std::endl;
