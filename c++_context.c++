@@ -44,11 +44,26 @@ std::string get_context(const CXCursor& cursor, const size_t query_offset)
             [query_offset, &result](const CXCursor& cursor, const CXCursor& /*parent*/)
             {
                 const auto cursor_extent = clang_getCursorExtent(cursor);
-                if (Libclang::get_one_beyond_end_offset(cursor_extent) <= query_offset)
+
+#if CINDEX_VERSION_MAJOR > 0 || CINDEX_VERSION_MINOR >= 20
+                const bool start_of_cursor_in_main_file = clang_Location_isFromMainFile(clang_getRangeStart(cursor_extent));
+                const bool end_of_cursor_in_main_file = clang_Location_isFromMainFile(clang_getRangeEnd(cursor_extent));
+#else
+                const bool start_of_cursor_in_main_file = true; // XXX
+                const bool end_of_cursor_in_main_file = true; // XXX
+#endif
+
+                if (not (start_of_cursor_in_main_file or end_of_cursor_in_main_file)) // "if cursor is not for an AST element in the 'main' file"  XXX This condition doesn't correctly handle the (very unlikely) case where an AST element relates to part of the main file even though the start and end of the AST element are not in the main file.
                 {
                     return Libclang::NextNode::Sibling;
                 }
-                if (Libclang::get_start_offset(cursor_extent) > query_offset)
+                if (end_of_cursor_in_main_file
+                    and Libclang::get_one_beyond_end_offset(cursor_extent) <= query_offset)
+                {
+                    return Libclang::NextNode::Sibling;
+                }
+                if (start_of_cursor_in_main_file
+                    and Libclang::get_start_offset(cursor_extent) > query_offset)
                 {
                     return Libclang::NextNode::None;
                 }
