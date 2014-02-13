@@ -46,7 +46,7 @@ void test(const char* test_name,
 }
 
 
-int main()
+void test_global_scope()
 {
     test("Global scope",
             "HERE>\nint main(int argc, char* argv[]) { }\n",
@@ -55,8 +55,10 @@ int main()
     test("Global scope - after a function",
             "\nint main() { }HERE>\n\n",
          "");
+}
 
-
+void test_functions()
+{
     test("function",
             "int main(int argc, char* argv[])\n"
             "{HERE> return 0; }\n",
@@ -97,18 +99,10 @@ int main()
             "int main()\n"
             "{ auto f = [](bool){ HERE>return 42; }; }\n",
           "main()\n[]"/*XXX bool */"\n");
+}
 
-
-    test("namespace",
-            "namespace MyNamespace\n"
-            "{\n"
-            "   void doit()\n"
-            "   {HERE> }\n"
-            "}\n",
-         "namespace MyNamespace\n"
-         "doit()\n");
-
-
+void test_classes()
+{
     test("class",
             "class X\n"
             "{\n"
@@ -146,7 +140,10 @@ int main()
     test("template union",
             "template<typename T> union U { HERE>T v; bool b; };\n",
           "union U<T>\n");
+}
 
+void test_enums()
+{
     test("enum",
             "enum E { ONE, TWO, HERE>THREE };\n",
          "enum E\n");
@@ -154,13 +151,23 @@ int main()
     test("enum class",
             "enum class E : char { ONE, TWO, HERE>THREE };\n",
          "enum E\n");
+}
 
+void test_miscellaneous()
+{
+    test("namespace",
+            "namespace MyNamespace\n"
+            "{\n"
+            "   void doit()\n"
+            "   {HERE> }\n"
+            "}\n",
+         "namespace MyNamespace\n"
+         "doit()\n");
 
     test("include file",
             "#include <iostream>\n"
             "int main() { HERE>; }\n",
          "main()\n");
-
 
 #if 0
     // The "struct" appears twice in the AST: once at the top-level, and once as a child of "typedef C_Struct". At the time of writing, "struct" was returned twice by get_context(), i.e. both "struct" nodes were visited.
@@ -168,7 +175,16 @@ int main()
             "typedef struct { HERE>int i; } C_Struct;\n",
          /*XXX "typedef C_Struct\n"*/"struct S\n");
 #endif
+}
 
+
+int main()
+{
+    test_global_scope();
+    test_functions();
+    test_classes();
+    test_enums();
+    test_miscellaneous();
 
     if (num_test_failures == 0)
     {
