@@ -120,7 +120,7 @@ namespace Libclang
     size_t get_offset(const CXSourceLocation& location)
     {
         unsigned offset;
-        clang_getExpansionLocation(location, /*file*/ NULL, /*line*/ NULL, /*column*/ NULL, &offset);
+        clang_getFileLocation(location, /*file*/ NULL, /*line*/ NULL, /*column*/ NULL, &offset);
         return offset;
     }
 

@@ -175,6 +175,11 @@ void test_miscellaneous()
             "typedef struct { HERE>int i; } C_Struct;\n",
          /*XXX "typedef C_Struct\n"*/"struct S\n");
 #endif
+
+    test("macro expansion",
+            "#define MY_STRUCT(NAME) struct My##NAME\n"
+            "HERE>MY_STRUCT(JustAnInt) { int i; };\n",
+         "struct MyJustAnInt\n");
 }
 
 
