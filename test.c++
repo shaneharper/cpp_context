@@ -9,9 +9,9 @@ static unsigned num_test_failures = 0;
 static std::string get_context(const char* source_code, const size_t query_offset)
 {
     Libclang::TranslationUnitContext translation_unit_context;
-    Libclang::TranslationUnit translation_unit(translation_unit_context, "unsaved.c++",
+    Libclang::TranslationUnit translation_unit(translation_unit_context, "test_program.c++",
             /*command_line_args*/ {"-std=c++11"},
-            /*unsaved_files*/ {{"unsaved.c++", source_code, strlen(source_code)}},
+            /*unsaved_files*/ {{"test_program.c++", source_code, strlen(source_code)}},
             /*options*/ CXTranslationUnit_None);
 
     return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
@@ -75,9 +75,16 @@ void test_functions()
             "void fn2() { }\n",
          "main()\n");
 
+    test("template function",
+            "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
+         "fn" /*XXX "<T>"*/ "(const T &)\n");
+}
+
+void test_member_functions()
+{
     test("member function",
             "struct S { void doit() { HERE>; } };\n",
-         "struct S\ndoit()\n");
+         "struct S\ndoit()\n" /*XXX or "S::doit()\n" ?*/);
 
     test("constructor",
             "struct S { int i; S(int i) : i(i) { HERE>; } };\n",
@@ -90,10 +97,6 @@ void test_functions()
     test("conversion function",
             "struct S { operator int() { HERE>return 42; } };\n",
          "struct S\noperator int()\n");
-
-    test("template function",
-            "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
-         "fn(const T &)\n");
 
     test("lambda function",
             "int main()\n"
@@ -187,6 +190,7 @@ int main()
 {
     test_global_scope();
     test_functions();
+    test_member_functions();
     test_classes();
     test_enums();
     test_miscellaneous();
