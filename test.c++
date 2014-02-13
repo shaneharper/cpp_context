@@ -162,6 +162,14 @@ int main()
          "main()\n");
 
 
+#if 0
+    // The "struct" appears twice in the AST: once at the top-level, and once as a child of "typedef C_Struct". At the time of writing, "struct" was returned twice by get_context(), i.e. both "struct" nodes were visited.
+    test("typedef of a struct",
+            "typedef struct { HERE>int i; } C_Struct;\n",
+         /*XXX "typedef C_Struct\n"*/"struct S\n");
+#endif
+
+
     if (num_test_failures == 0)
     {
         std::cout << "Ok" << std::endl;
