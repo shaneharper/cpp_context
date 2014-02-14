@@ -86,6 +86,11 @@ void test_member_functions()
             "struct S { void doit() { HERE>; } };\n",
          "struct S\ndoit()\n" /*XXX or "S::doit()\n" ?*/);
 
+    test("member function declaration",
+            "struct S { void HERE>doit(); };\n"
+            "void S::doit() {}\n",
+         "struct S\ndoit()\n" /*XXX or "S::doit()\n", or just "struct S" (as we don't need to be told about the function declaration at the query location)?*/);
+
     test("constructor",
             "struct S { int i; S(int i) : i(i) { HERE>; } };\n",
          "struct S\nS(int)\n");
@@ -113,6 +118,12 @@ void test_classes()
             "  HERE>public: X();\n"
             "};\n",
          "class X\n");
+
+    test("subclass",
+            "struct Base1 { int i; };\n"
+            "struct Base2 { int j; };\n"
+            "class Derived : public Base1, Base2 { HERE>public: int k; };\n",
+         "class Derived" /*XXX " : public Base"*/ "\n");
 
     test("template class",
             "template<typename T> class C { public: HERE>T v; };\n",
