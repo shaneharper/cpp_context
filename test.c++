@@ -4,9 +4,9 @@
 #include <string>
 
 
-static unsigned num_test_failures = 0;
+unsigned test_failure_count = 0;
 
-static std::string get_context(const char* source_code, const char* header_file_contents, const size_t query_offset)
+std::string get_context(const char* source_code, const char* header_file_contents, const size_t query_offset)
 {
     Libclang::TranslationUnitContext translation_unit_context;
     Libclang::TranslationUnit translation_unit(translation_unit_context, "test_program.c++",
@@ -29,7 +29,7 @@ void test(const char* test_name,
     if (query_offset == std::string::npos)
     {
         std::cout << test_name << " test is broken." << std::endl << std::endl;
-        ++num_test_failures;
+        ++test_failure_count;
         return;
     }
 
@@ -43,7 +43,7 @@ void test(const char* test_name,
               << "Expected: " << std::endl << expected_output //<< std::endl
               << "Actual Output: " << std::endl << output << std::endl
               << std::endl;
-        ++num_test_failures;
+        ++test_failure_count;
     }
 }
 
@@ -220,9 +220,9 @@ int main()
     test_enums();
     test_miscellaneous();
 
-    if (num_test_failures == 0)
+    if (test_failure_count == 0)
     {
         std::cout << "Ok" << std::endl;
     }
-    return num_test_failures;
+    return test_failure_count;
 }
