@@ -6,12 +6,13 @@
 
 static unsigned num_test_failures = 0;
 
-static std::string get_context(const char* source_code, const size_t query_offset)
+static std::string get_context(const char* source_code, const char* header_file_contents, const size_t query_offset)
 {
     Libclang::TranslationUnitContext translation_unit_context;
     Libclang::TranslationUnit translation_unit(translation_unit_context, "test_program.c++",
             /*command_line_args*/ {"-std=c++11"},
-            /*unsaved_files*/ {{"test_program.c++", source_code, strlen(source_code)}},
+            /*unsaved_files*/ {{"test_program.c++", source_code, strlen(source_code)},
+                               {"/header.h++", header_file_contents, strlen(header_file_contents)}},
             /*options*/ CXTranslationUnit_None);
 
     return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
@@ -20,6 +21,7 @@ static std::string get_context(const char* source_code, const size_t query_offse
 
 void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,
+          const char* header_file_contents,
           const char* expected_output)
 {
     const auto query_offset = std::string(source_code_with_HERE_denoting_query_position).find("HERE>");
@@ -33,7 +35,7 @@ void test(const char* test_name,
 
     const auto output = get_context(
         std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
-        query_offset);
+        header_file_contents, query_offset);
 
     if (output != expected_output)
     {
@@ -45,6 +47,12 @@ void test(const char* test_name,
     }
 }
 
+void test(const char* test_name,
+          const char* source_code_with_HERE_denoting_query_position,
+          const char* expected_output)
+{
+    test(test_name, source_code_with_HERE_denoting_query_position, /*header_file_contents*/ "", expected_output);
+}
 
 void test_global_scope()
 {
@@ -179,8 +187,14 @@ void test_miscellaneous()
          "doit()\n");
 
     test("include file",
-            "#include <iostream>\n"
-            "int main() { HERE>; }\n",
+            "#include \"/header.h++\"\n"
+            "int main() { HERE>doit(); }\n",
+            /*header.h++*/
+            "void doit()\n"
+            "{\n"
+            "   // ------------------------------------------------------------------------\n"
+            "}\n"
+            "extern int i;\n",
          "main()\n");
 
 #if 0
