@@ -8,6 +8,6 @@ _C++ Context_ takes as input a position in a C++ source file and outputs the cor
 _C++ Context_ could be used:
 * to annotate the output of a search tool such as 'grep'.
 * to annotate a text editor's "tag stack", adding context to the "jumped from" locations.
-* when viewing long, unfamiliar function or class definitions.
+* when viewing long, unfamiliar function or class definitions - context could be shown in a status bar or at the top of the window.
 
 _C++ Context_ uses libclang.
