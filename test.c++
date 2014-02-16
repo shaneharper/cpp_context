@@ -1,10 +1,18 @@
 #include "libclang++.h++"
+#include <algorithm> // for_each
+#include <atomic>
 #include <cstring> // strlen
 #include <iostream>
+#include <mutex>
 #include <string>
+#include <thread>
+#include <vector>
 
 
-unsigned test_failure_count = 0;
+std::atomic<unsigned> test_failure_count{0};
+std::recursive_mutex stdout_mutex;
+std::vector<std::thread> threads;
+
 
 std::string get_context(const char* source_code, const char* header_file_contents, const size_t query_offset)
 {
@@ -28,9 +36,11 @@ void test(const char* test_name,
     if (output != expected_output)
     {
         ++test_failure_count;
+
+        std::lock_guard<std::recursive_mutex> lock_guard(stdout_mutex);
         std::cout << test_name << " test failed." << std::endl
               << "Expected: " << std::endl << expected_output //<< std::endl
-              << "Actual Output: " << std::endl << output << std::endl
+              << "Actual Output: " << std::endl << output //<< std::endl
               << std::endl;
     }
 }
@@ -38,21 +48,25 @@ void test(const char* test_name,
 void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,
           const char* header_file_contents,
-          const char* expected_output)
+          const char* expected_output) // Note: pointers need to remain valid until test completes!
 {
-    const auto query_offset = std::string(source_code_with_HERE_denoting_query_position).find("HERE>");
+    threads.emplace_back([=]{
+        const auto query_offset = std::string(source_code_with_HERE_denoting_query_position).find("HERE>");
 
-    if (query_offset == std::string::npos)
-    {
-        ++test_failure_count;
-        std::cout << test_name << " test is broken." << std::endl << std::endl;
-        return;
-    }
+        if (query_offset == std::string::npos)
+        {
+            ++test_failure_count;
 
-    test(test_name, query_offset,
-         std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
-         header_file_contents,
-         expected_output);
+            std::lock_guard<std::recursive_mutex> lock_guard(stdout_mutex);
+            std::cout << test_name << " test is broken." << std::endl << std::endl;
+            return;
+        }
+
+        test(test_name, query_offset,
+            std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
+            header_file_contents,
+            expected_output);
+    });
 }
 
 void test(const char* test_name,
@@ -228,6 +242,8 @@ int main()
     test_classes();
     test_enums();
     test_miscellaneous();
+
+    std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
 
     if (test_failure_count == 0)
     {
