@@ -108,6 +108,11 @@ void test_member_functions()
             "void S::doit() {}\n",
          "struct S\ndoit()\n" /*XXX or "S::doit()\n", or just "struct S" (as we don't need to be told about the function declaration at the query location)?*/);
 
+    test("member function defined out-of-class",
+            "struct S { void doit(); };\n"
+            "void S::doit() {HERE> }\n",
+         "S::doit()\n");
+
     test("constructor",
             "struct S { int i; S(int i) : i(i) { HERE>; } };\n",
          "struct S\nS(int)\n");
