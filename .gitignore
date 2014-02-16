@@ -1,3 +1,4 @@
 .*sw?
 test
+*.pch
 compile_commands.json
