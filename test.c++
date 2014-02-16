@@ -20,6 +20,22 @@ std::string get_context(const char* source_code, const char* header_file_content
 }
 
 void test(const char* test_name,
+          size_t query_offset, const char* source_code,
+          const char* header_file_contents,
+          const char* expected_output)
+{
+    const auto output = get_context(source_code, header_file_contents, query_offset);
+    if (output != expected_output)
+    {
+        ++test_failure_count;
+        std::cout << test_name << " test failed." << std::endl
+              << "Expected: " << std::endl << expected_output //<< std::endl
+              << "Actual Output: " << std::endl << output << std::endl
+              << std::endl;
+    }
+}
+
+void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,
           const char* header_file_contents,
           const char* expected_output)
@@ -28,23 +44,15 @@ void test(const char* test_name,
 
     if (query_offset == std::string::npos)
     {
-        std::cout << test_name << " test is broken." << std::endl << std::endl;
         ++test_failure_count;
+        std::cout << test_name << " test is broken." << std::endl << std::endl;
         return;
     }
 
-    const auto output = get_context(
-        std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
-        header_file_contents, query_offset);
-
-    if (output != expected_output)
-    {
-        std::cout << test_name << " test failed." << std::endl
-              << "Expected: " << std::endl << expected_output //<< std::endl
-              << "Actual Output: " << std::endl << output << std::endl
-              << std::endl;
-        ++test_failure_count;
-    }
+    test(test_name, query_offset,
+         std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
+         header_file_contents,
+         expected_output);
 }
 
 void test(const char* test_name,
@@ -53,6 +61,7 @@ void test(const char* test_name,
 {
     test(test_name, source_code_with_HERE_denoting_query_position, /*header_file_contents*/ "", expected_output);
 }
+
 
 void test_global_scope()
 {
