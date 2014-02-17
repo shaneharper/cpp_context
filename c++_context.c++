@@ -25,16 +25,15 @@ static std::string scope_name(const CXCursor& cursor)
 // XXX        { CXCursor_TypedefDecl,         "typedef "}
     };
     auto it = cursor_kinds_that_introduce_a_named_scope.find(clang_getCursorKind(cursor));
-    if (it != cursor_kinds_that_introduce_a_named_scope.end())
+    if (it == cursor_kinds_that_introduce_a_named_scope.end())
+        return "";
+
+    if (template_class_or_struct_or_union == it->second)
     {
-        if (template_class_or_struct_or_union == it->second)
-        {
-            it = cursor_kinds_that_introduce_a_named_scope.find(clang_getTemplateCursorKind(cursor));
-            if (it == cursor_kinds_that_introduce_a_named_scope.end()) { return "ERROR determining template type.\n"; }
-        }
-        return it->second + Libclang::get_display_name(cursor) + "\n";
+        it = cursor_kinds_that_introduce_a_named_scope.find(clang_getTemplateCursorKind(cursor));
+        if (it == cursor_kinds_that_introduce_a_named_scope.end()) { return "ERROR determining template type.\n"; }
     }
-    return "";
+    return it->second + Libclang::get_display_name(cursor) + "\n";
 }
 
 std::string get_context(const CXCursor& cursor, const size_t query_offset)
