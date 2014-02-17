@@ -215,6 +215,14 @@ void test_miscellaneous()
             "extern int i;\n",
          "main()\n");
 
+    test("struct spanning two files",
+            "#include \"/header.h++\"\n"
+            " HERE>int i; };\n",
+            /*header.h++*/
+            "extern int v;\n"
+            "struct Never {\n",
+         "struct Never\n");
+
 #if 0
     // The "struct" appears twice in the AST: once at the top-level, and once as a child of "typedef C_Struct". At the time of writing, "struct" was returned twice by get_context(), i.e. both "struct" nodes were visited.
     test("typedef of a struct",
