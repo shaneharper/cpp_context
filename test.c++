@@ -19,8 +19,10 @@ std::string get_context(const char* source_code, const char* header_file_content
         : get_context(translation_unit.get_cursor(), query_offset);
 }
 
+
 void test(const char* test_name,
-          size_t query_offset, const char* source_code,
+          size_t      query_offset,
+          const char* source_code,
           const char* header_file_contents,
           const char* expected_output)
 {
@@ -34,6 +36,7 @@ void test(const char* test_name,
               << std::endl;
     }
 }
+
 
 void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,
@@ -54,6 +57,7 @@ void test(const char* test_name,
          header_file_contents,
          expected_output);
 }
+
 
 void test(const char* test_name,
           const char* source_code_with_HERE_denoting_query_position,

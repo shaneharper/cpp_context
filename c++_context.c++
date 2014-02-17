@@ -1,5 +1,4 @@
 #include "libclang++.h++"
-#include <cstring> // strlen
 #include <map>
 
 
