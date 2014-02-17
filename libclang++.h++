@@ -111,6 +111,7 @@ namespace Libclang
             &function);
     }
 
+
     String get_display_name(const CXCursor& cursor)
     {
         return clang_getCursorDisplayName(cursor);
@@ -124,6 +125,7 @@ namespace Libclang
         return offset;
     }
 
+
     size_t get_start_offset(const CXSourceRange& extent)
     {
         return get_offset(clang_getRangeStart(extent));
@@ -134,10 +136,12 @@ namespace Libclang
         return get_offset(clang_getRangeEnd(extent));
     }
 
+
     std::string operator+(const String& s, const char* t)
     {
         return static_cast<const char*>(s) + std::string{t};
     }
+
     std::string operator+(const char* s, const String& t)
     {
         return std::string{s} + static_cast<const char*>(t);

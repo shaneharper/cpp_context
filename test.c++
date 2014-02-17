@@ -16,7 +16,7 @@ std::string get_context(const char* source_code, const char* header_file_content
             /*options*/ CXTranslationUnit_None);
 
     return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
-        : get_context(translation_unit.get_cursor(), query_offset);
+        : get_context(translation_unit, query_offset);
 }
 
 
@@ -31,9 +31,9 @@ void test(const char* test_name,
     {
         ++test_failure_count;
         std::cout << test_name << " test failed." << std::endl
-              << "Expected: " << std::endl << expected_output //<< std::endl
-              << "Actual Output: " << std::endl << output << std::endl
-              << std::endl;
+              << "Expected: " << std::endl << expected_output
+              << "Actual Output: " << std::endl << output
+              << std::endl << std::endl;
     }
 }
 
