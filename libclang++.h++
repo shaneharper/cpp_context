@@ -125,6 +125,13 @@ namespace Libclang
         return offset;
     }
 
+    CXFile get_file(const CXSourceLocation& location)
+    {
+        CXFile file;
+        clang_getFileLocation(location, &file, /*line*/ NULL, /*column*/ NULL, /*offset*/ NULL);
+        return file;
+    }
+
 
     size_t get_start_offset(const CXSourceRange& extent)
     {
@@ -145,5 +152,19 @@ namespace Libclang
     std::string operator+(const char* s, const String& t)
     {
         return std::string{s} + static_cast<const char*>(t);
+    }
+
+
+    CXFile get_file(CXTranslationUnit translation_unit, const char* file_name)
+    {
+        if (CXFile f = clang_getFile(translation_unit, file_name))
+            return f;
+        throw std::runtime_error("clang_getFile() failed.");
+    }
+
+    CXFile get_main_file(CXTranslationUnit translation_unit)
+    {
+        const String main_file_name {clang_getTranslationUnitSpelling(translation_unit)};
+        return get_file(translation_unit, main_file_name);
     }
 }
