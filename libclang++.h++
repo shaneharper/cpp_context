@@ -175,10 +175,4 @@ namespace Libclang
             return f;
         throw std::runtime_error("clang_getFile() failed.");
     }
-
-    CXFile get_main_file(CXTranslationUnit translation_unit)
-    {
-        const String main_file_name {clang_getTranslationUnitSpelling(translation_unit)};
-        return get_file(translation_unit, main_file_name);
-    }
 }

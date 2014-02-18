@@ -36,41 +36,23 @@ static std::string scope_name(const CXCursor& cursor)
 }
 
 
-std::string get_context(/*const*/ Libclang::TranslationUnit& translation_unit, const size_t main_file_offset)
+
+CXCursor get_cursor(CXTranslationUnit translation_unit, CXFile file, size_t byte_offset)
 {
-    std::string result;
+    return clang_getCursor(translation_unit, clang_getLocationForOffset(translation_unit, file, byte_offset));
+}
 
-#if CINDEX_VERSION < CINDEX_VERSION_ENCODE(0, 20)
-    const CXFile main_file {Libclang::get_main_file(translation_unit)};
-    const auto clang_Location_isFromMainFile = [&main_file](const CXSourceLocation &location){ return main_file == Libclang::get_file(location); }; // XXX is it ok to compare CXFiles with ==? Should I be comparing CXFileUniqueIDs (and using clang_getFileUniqueID()?)
-#endif
+std::string get_context(CXCursor cursor)
+{
+    // CXCursor_TypeRef, which can appear in a template defintion, has no parent, so use another cursor:
+    if /*XXX while */ (CXCursor_TypeRef == clang_getCursorKind(cursor))
+    {
+        const auto extent = clang_getCursorExtent(cursor);
+        cursor = get_cursor(clang_Cursor_getTranslationUnit(cursor),
+                            Libclang::get_file(clang_getRangeEnd(extent)),
+                            Libclang::get_one_beyond_end_offset(extent) /*I assume "one beyond" is never the end of file.*/);
+    }
 
-    Libclang::visit_children(translation_unit.get_cursor(),
-            [&](const CXCursor& cursor, const CXCursor& /*parent*/)
-            {
-                const auto cursor_extent = clang_getCursorExtent(cursor);
-
-                const bool is_cursor_start_in_main_file = clang_Location_isFromMainFile(clang_getRangeStart(cursor_extent));
-                const bool is_cursor_end_in_main_file = clang_Location_isFromMainFile(clang_getRangeEnd(cursor_extent));
-
-                if (not (is_cursor_start_in_main_file or is_cursor_end_in_main_file)) // "if cursor is not for an AST element in the 'main' file"  XXX This condition doesn't correctly handle the (very unlikely) case where an AST element relates to part of the main file even though the start and end of the AST element are not in the main file.
-                {
-                    return Libclang::NextNode::Sibling;
-                }
-                if (is_cursor_end_in_main_file
-                    and Libclang::get_one_beyond_end_offset(cursor_extent) <= main_file_offset)
-                {
-                    return Libclang::NextNode::Sibling;
-                }
-                if (is_cursor_start_in_main_file
-                    and Libclang::get_start_offset(cursor_extent) > main_file_offset)
-                {
-                    return Libclang::NextNode::None;
-                }
-
-                result += scope_name(cursor);
-                return Libclang::NextNode::Child;
-            });
-
-    return result;
+    return clang_Cursor_isNull(cursor) ? ""
+        : (get_context(clang_getCursorSemanticParent(cursor)) + scope_name(cursor));
 }
