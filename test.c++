@@ -216,6 +216,11 @@ void test_miscellaneous()
             "int main() { HERE>doit(); }\n",
          "main()\n");
 
+    test("include",
+            /*header.h++*/ "struct S { int i; };\n",
+            /*main file*/  "#include HERE>\"/header.h++\"\n",
+         "");
+
     test("struct spanning two files",
             /*header.h++*/
             "extern int v;\n"
