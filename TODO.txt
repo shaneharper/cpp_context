@@ -1,3 +1,1 @@
 Makefile: Fix specification of libclang paths which are currently hardcoded for v3.4.
-
-Consider starting from the cursor returned by clang_getCursor(tu, query_location) rather than from the top-level cursor (Libclang::TranslationUnit::get_cursor()). Is there a performance advantage? Note to find "early returns" from a function it'll be necessary to sometimes descend (as well as ascend using clang_getCursorLexicalParent) the AST when starting from the cursor returned from clang_getCursor().
