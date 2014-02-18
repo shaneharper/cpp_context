@@ -6,27 +6,28 @@
 
 unsigned test_failure_count = 0;
 
-std::string get_context(const char* source_code, const char* header_file_contents, const size_t query_offset)
+
+std::string get_context(const char* header_text, const char* source_text, const size_t source_text_offset)
 {
     Libclang::TranslationUnitContext translation_unit_context;
     Libclang::TranslationUnit translation_unit(translation_unit_context, "test_program.c++",
             /*command_line_args*/ {"-std=c++11"},
-            /*unsaved_files*/ {{"test_program.c++", source_code, strlen(source_code)},
-                               {"/header.h++", header_file_contents, strlen(header_file_contents)}},
+            /*unsaved_files*/ {{"test_program.c++", source_text},
+                               {"/header.h++", header_text}},
             /*options*/ CXTranslationUnit_None);
 
     return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
-        : get_context(translation_unit, query_offset);
+        : get_context(translation_unit, source_text_offset);
 }
 
 
 void test(const char* test_name,
-          size_t      query_offset,
-          const char* source_code,
-          const char* header_file_contents,
+          const char* header_text,
+          const char* source_text,
+          size_t      source_text_offset,
           const char* expected_output)
 {
-    const auto output = get_context(source_code, header_file_contents, query_offset);
+    const auto output = get_context(header_text, source_text, source_text_offset);
     if (output != expected_output)
     {
         ++test_failure_count;
@@ -39,31 +40,31 @@ void test(const char* test_name,
 
 
 void test(const char* test_name,
-          const char* source_code_with_HERE_denoting_query_position,
-          const char* header_file_contents,
+          const char* header_text,
+          const char* source_text_with_HERE_denoting_query_position,
           const char* expected_output)
 {
-    const auto query_offset = std::string(source_code_with_HERE_denoting_query_position).find("HERE>");
+    const auto source_text_offset = std::string(source_text_with_HERE_denoting_query_position).find("HERE>");
 
-    if (query_offset == std::string::npos)
+    if (source_text_offset == std::string::npos)
     {
         ++test_failure_count;
         std::cout << test_name << " test is broken." << std::endl << std::endl;
         return;
     }
 
-    test(test_name, query_offset,
-         std::string(source_code_with_HERE_denoting_query_position).replace(query_offset, strlen("HERE>"), "").c_str(),
-         header_file_contents,
+    test(test_name, header_text,
+         std::string(source_text_with_HERE_denoting_query_position).replace(source_text_offset, strlen("HERE>"), "").c_str(),
+         source_text_offset,
          expected_output);
 }
 
 
 void test(const char* test_name,
-          const char* source_code_with_HERE_denoting_query_position,
+          const char* source_text_with_HERE_denoting_query_position,
           const char* expected_output)
 {
-    test(test_name, source_code_with_HERE_denoting_query_position, /*header_file_contents*/ "", expected_output);
+    test(test_name, /*header_text*/ "", source_text_with_HERE_denoting_query_position, expected_output);
 }
 
 
@@ -205,22 +206,23 @@ void test_miscellaneous()
          "doit()\n");
 
     test("include file",
-            "#include \"/header.h++\"\n"
-            "int main() { HERE>doit(); }\n",
             /*header.h++*/
             "void doit()\n"
             "{\n"
             "   // ------------------------------------------------------------------------\n"
-            "}\n"
-            "extern int i;\n",
+            "}\n",
+            /*main file*/
+            "#include \"/header.h++\"\n"
+            "int main() { HERE>doit(); }\n",
          "main()\n");
 
     test("struct spanning two files",
-            "#include \"/header.h++\"\n"
-            " HERE>int i; };\n",
             /*header.h++*/
             "extern int v;\n"
             "struct Never {\n",
+            /*main file*/
+            "#include \"/header.h++\"\n"
+            " HERE>int i; };\n",
          "struct Never\n");
 
 #if 0

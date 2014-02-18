@@ -3,6 +3,7 @@
 #pragma once
 
 #include <clang-c/Index.h>
+#include <cstring> // strlen
 #include <stdexcept>
 #include <vector>
 
@@ -39,6 +40,19 @@ namespace Libclang
     using TranslationUnitContext = Index;
 
 
+    struct UnsavedFile : CXUnsavedFile
+    {
+        UnsavedFile(const char* filename, const char* contents)
+          : UnsavedFile{filename, contents, strlen(contents)}
+        {
+        }
+        UnsavedFile(const char* filename, const char* contents, size_t content_length)
+          : CXUnsavedFile{filename, contents, content_length}
+        {
+        }
+    };
+
+
     class TranslationUnit
     {
         CXTranslationUnit translation_unit;
@@ -47,7 +61,7 @@ namespace Libclang
                 TranslationUnitContext& translation_unit_context,
                 const char *source_filename,
                 const std::vector<const char*>& command_line_args,
-                /*const*/ std::vector<CXUnsavedFile> unsaved_files /* contents and filenames as specified by CXUnsavedFile are copied when necessary - client only needs to guarantee their validity until the call to this function returns. */,
+                /*const*/ std::vector<UnsavedFile> unsaved_files /* contents and filenames as specified by CXUnsavedFile are copied when necessary - client only needs to guarantee their validity until the call to this function returns. */,
                 unsigned /*See enum CXTranslationUnit_Flags*/ options)
           : translation_unit{clang_parseTranslationUnit(
                       translation_unit_context, source_filename,
