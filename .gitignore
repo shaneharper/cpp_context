@@ -1,4 +1,5 @@
 .*sw?
+c++_context
 test
 *.pch
 compile_commands.json
