@@ -22,10 +22,10 @@ On Ubuntu 13.10:
 
 ### Compilation database
 
-c++_context uses a `compile_commands.json` file to find which compiler options are needed for each source file. `c++_context` searches for `compile_commands.json` in the current directory, and then the parent directories.
+`c++_context` uses a `compile_commands.json` file to find which compiler options are needed for each source file. `c++_context` searches for `compile_commands.json` in the current directory, and then the parent directories.
 
-See [Bear](https://github.com/rizsotto/Bear). (I had to `sudo apt-get install libconfig8-dev` before building bear.)
-
-http://clang.llvm.org/docs/HowToSetupToolingForLLVM.html
+See:
+* [Bear](https://github.com/rizsotto/Bear). (I had to `sudo apt-get install libconfig8-dev` before building bear.)
+* http://clang.llvm.org/docs/HowToSetupToolingForLLVM.html
 
 At the time of writing, cmake and bear don't output entries in `compile_commands.json` for header files. :-(
