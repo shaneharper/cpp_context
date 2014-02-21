@@ -29,3 +29,11 @@ See:
 * http://clang.llvm.org/docs/HowToSetupToolingForLLVM.html
 
 At the time of writing, cmake and bear don't output entries in `compile_commands.json` for header files. :-(
+
+
+### Using _C++ Context_ with Vim editor
+
+`c++_context.vim` maps `<localleader>c` to display the context for the current cursor position. (`<localleader>` defaults to `\`.)
+
+    :source /path/to/c++_context.vim
+can be added to your .vimrc.
