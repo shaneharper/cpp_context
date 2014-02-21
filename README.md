@@ -31,7 +31,7 @@ See:
 At the time of writing, cmake and bear don't output entries in `compile_commands.json` for header files. :-(
 
 
-### Using _C++ Context_ with Vim editor
+### Using C++ Context with Vim editor
 
 `c++_context.vim` maps `<localleader>c` to display the context for the current cursor position. (`<localleader>` defaults to `\`.)
 
