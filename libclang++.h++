@@ -71,6 +71,7 @@ namespace Libclang
         {
             if (!translation_unit)
             {
+                // XXX It'd be really nice to get a diagnostic code/message out of libclang when creation of the translation unit fails. See clang SVN commit r201249.
                 throw std::runtime_error("clang_parseTranslationUnit() failed.");
             }
         }
