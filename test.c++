@@ -101,6 +101,11 @@ void test_functions()
             "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
          "fn" /*XXX "<T>"*/ "(const T &)\n");
 
+    test("lambda function",
+            "int main()\n"
+            "{ auto f = [](bool){ HERE>return 42; }; }\n",
+          "main()\n[]"/*XXX bool */"\n");
+
     // XXX Test fails: Libclang passes an CXCursor_UnexposedDecl for the friend function definition.
 //    test("friend function defined inside friend class",
 //            "class C {\n"
@@ -126,6 +131,12 @@ void test_member_functions()
             "struct S { void doit() { HERE>; } };\n",
          "struct S\ndoit()\n" /*XXX or "S::doit()\n" ?*/);
 
+#if 0 // XXX
+    test("static member function",
+            "struct S { static void doit() { HERE>; } };\n",
+         "struct S\nstatic doit()\n" // Nice to know we're in a static member
+#endif
+
     test("member function declaration",
             "struct S { void HERE>doit(); };\n"
             "void S::doit() {}\n",
@@ -147,11 +158,6 @@ void test_member_functions()
     test("conversion function",
             "struct S { operator int() { HERE>return 42; } };\n",
          "struct S\noperator int()\n");
-
-    test("lambda function",
-            "int main()\n"
-            "{ auto f = [](bool){ HERE>return 42; }; }\n",
-          "main()\n[]"/*XXX bool */"\n");
 }
 
 void test_classes()
