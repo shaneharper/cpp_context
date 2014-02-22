@@ -2,6 +2,22 @@
 #include <map>
 
 
+std::string class_name_with_double_colons(CXCursor cursor) // returns nested class names, if any
+{
+    std::string scope;
+    for (; Libclang::is_class_struct_or_union(cursor); cursor = clang_getCursorSemanticParent(cursor))
+    {
+        scope = Libclang::get_display_name(cursor) + "::" + scope;
+    }
+    return scope;
+}
+
+bool is_out_of_class_member_function_definition(const CXCursor& c)
+{
+    return Libclang::is_member_function(c)
+        and clang_getCursorLexicalParent(c) != clang_getCursorSemanticParent(c);
+}
+
 static std::string scope_name(const CXCursor& cursor)
 {
     static const char* template_class_or_struct_or_union = "template_class_or_struct_or_union";
@@ -31,6 +47,11 @@ static std::string scope_name(const CXCursor& cursor)
     {
         it = cursor_kinds_that_introduce_a_named_scope.find(clang_getTemplateCursorKind(cursor));
         if (it == cursor_kinds_that_introduce_a_named_scope.end()) { return "ERROR determining template type.\n"; }
+    }
+    if (is_out_of_class_member_function_definition(cursor))
+    {
+        return class_name_with_double_colons(clang_getCursorSemanticParent(cursor))
+            + Libclang::get_display_name(cursor) + "\n";
     }
     return it->second + Libclang::get_display_name(cursor) + "\n";
 }

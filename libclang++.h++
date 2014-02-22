@@ -132,6 +132,24 @@ namespace Libclang
         return clang_getCursorDisplayName(cursor);
     }
 
+    bool is_member_function(const CXCursor& c)
+    {
+        const auto kind = clang_getCursorKind(c);
+        return kind == CXCursor_CXXMethod /* used for template and non-template member functions */
+            or kind == CXCursor_Constructor
+            or kind == CXCursor_Destructor
+            or kind == CXCursor_ConversionFunction;
+    }
+
+    bool is_class_struct_or_union(const CXCursor& c)
+    {
+        const auto kind = clang_getCursorKind(c);
+        return kind == CXCursor_ClassDecl
+            or kind == CXCursor_StructDecl
+            or kind == CXCursor_UnionDecl
+            or kind == CXCursor_ClassTemplate
+            or kind == CXCursor_ClassTemplatePartialSpecialization;
+    }
 
     size_t get_offset(const CXSourceLocation& location)
     {
@@ -169,6 +187,11 @@ namespace Libclang
         return std::string{s} + static_cast<const char*>(t);
     }
 
+    std::string operator+(const std::string s, const String& t)
+    {
+        return s + static_cast<const char*>(t);
+    }
+
 
     CXFile get_file(CXTranslationUnit translation_unit, const char* file_name)
     {
@@ -183,3 +206,11 @@ namespace Libclang
         return get_file(translation_unit, main_file_name);
     }
 }
+
+
+bool operator==(const CXCursor& a, const CXCursor& b)
+{
+    return clang_equalCursors(a, b);
+}
+
+bool operator!=(const CXCursor& a, const CXCursor& b) { return not (a == b); }

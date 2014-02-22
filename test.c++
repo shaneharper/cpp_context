@@ -134,7 +134,11 @@ void test_member_functions()
 #if 0 // XXX
     test("static member function",
             "struct S { static void doit() { HERE>; } };\n",
-         "struct S\nstatic doit()\n" // Nice to know we're in a static member
+         "struct S\nstatic doit()\n"); // Nice to know we're in a static member
+
+    test("static member function defined out-of-class",
+            "struct S { static void doit(); }; void S::doit() { HERE>; }\n",
+         "static S::doit()\n"); // Nice to know we're in a static member
 #endif
 
     test("member function declaration",
@@ -147,17 +151,49 @@ void test_member_functions()
             "void S::doit() {HERE> }\n",
          "S::doit()\n");
 
+    test("template member function defined out-of-class",
+            "template<int N> struct S { void doit(); };\n"
+            "template<int N> void S<N>::doit() {HERE> }\n",
+         "S<N>::doit()\n");
+
+    test("member function of nested class defined out-of-class",
+            "class S { public: struct T { void doit(); }; };\n"
+            "void S::T::doit() {HERE> }\n",
+         "S::T::doit()\n");
+
+    test("member function defined out-of-class within a namespace",
+            "namespace N {\n"
+            "    struct S { void doit(); };\n"
+            "    void S::doit() {HERE> }\n"
+            "}\n",
+         "namespace N\nS::doit()\n");
+
     test("constructor",
             "struct S { int i; S(int i) : i(i) { HERE>; } };\n",
          "struct S\nS(int)\n");
+
+    test("constructor defined out-of-class",
+            "struct S { S(); };\n"
+            "S::S() {HERE> }\n",
+         "S::S()\n");
 
     test("destructor",
             "struct S {  ~S() { HERE>; } };\n",
          "struct S\n~S()\n");
 
+    test("destructor defined out-of-class",
+            "struct S { ~S(); };\n"
+            "S::~S() {HERE> }\n",
+         "S::~S()\n");
+
     test("conversion function",
             "struct S { operator int() { HERE>return 42; } };\n",
          "struct S\noperator int()\n");
+
+    test("conversion function defined out-of-class",
+            "struct S { operator int(); };\n"
+            "S::operator int() { HERE>return 42; }\n",
+         "S::operator int()\n");
 }
 
 void test_classes()
