@@ -100,6 +100,24 @@ void test_functions()
     test("template function",
             "template<typename T> T fn(const T& v) { HERE>return v+1; }\n",
          "fn" /*XXX "<T>"*/ "(const T &)\n");
+
+    // XXX Test fails: Libclang passes an CXCursor_UnexposedDecl for the friend function definition.
+//    test("friend function defined inside friend class",
+//            "class C {\n"
+//            "    static int secret;\n"
+//            "  public:\n"
+//            "    friend int get() { HERE> return secret; }\n"
+//            "};\n",
+//         "class C\nfriend get()\n");
+
+    test("friend function",
+            "class C {\n"
+            "    static int secret;\n"
+            "  public:\n"
+            "    friend int get();\n"
+            "};\n"
+            "int get() { HERE> return C::secret; }\n",
+         "get()\n");
 }
 
 void test_member_functions()
