@@ -16,7 +16,7 @@ std::string get_context(const char* header_text, const char* source_text, const 
                                {"/header.h++", header_text}},
             /*options*/ CXTranslationUnit_None);
 
-    return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic messages."
+    return clang_getNumDiagnostics(translation_unit) ? "Libclang generated diagnostic message/s."
         : get_context(translation_unit, source_text_offset);
 }
 

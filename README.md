@@ -1,11 +1,11 @@
 # C++ Context
 
-_C++ Context_ was written to aid software developers _quickly_ and _accurately_ comprehend C++ code.
+_C++ Context_ was written to aid software developers _quickly_ comprehend C++ code.
 
 _C++ Context_ takes as input a position in a C++ source file and outputs the corresponding "context", viz. the scope (namespace, class, and/or function). _C++ Context_ effectively "filters" context information from the source code text reducing the amount of text for the software developer to read.
 
 _C++ Context_ could be used:
-* to annotate the output of a search tool such as 'grep'.
+* to annotate the output of a search tool such as 'grep'. (Knowing the class/function where something appears can be more useful than knowing just the file and possibly line number.)
 * to annotate a text editor's "tag stack", adding context to the "jumped from" locations.
 * when viewing long, unfamiliar function or class definitions - context could be shown in a status bar or at the top of the window.
 
@@ -22,7 +22,7 @@ On Ubuntu 13.10:
 
 ### Compilation database
 
-`c++_context` uses a `compile_commands.json` file to find which compiler options are needed for each source file. `c++_context` searches for `compile_commands.json` in the current directory, and then the parent directories.
+`c++_context` uses a `compile_commands.json` file to find which compiler options are needed for each source file. `c++_context` will use `compile_commands.json` from the current directory if it exists, otherwise it will search parent directories.
 
 See:
 * [Bear](https://github.com/rizsotto/Bear). (I had to `sudo apt-get install libconfig8-dev` before building bear.)
