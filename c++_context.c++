@@ -48,12 +48,14 @@ static std::string scope_name(const CXCursor& cursor)
         it = cursor_kinds_that_introduce_a_named_scope.find(clang_getTemplateCursorKind(cursor));
         if (it == cursor_kinds_that_introduce_a_named_scope.end()) { return "ERROR determining template type.\n"; }
     }
-    if (is_out_of_class_member_function_definition(cursor))
-    {
-        return class_name_with_double_colons(clang_getCursorSemanticParent(cursor))
-            + Libclang::get_display_name(cursor) + "\n";
-    }
-    return it->second + Libclang::get_display_name(cursor) + "\n";
+
+    return std::string{(Libclang::is_member_function(cursor) and clang_CXXMethod_isStatic(cursor))
+                            ? "static " : ""}
+           + (is_out_of_class_member_function_definition(cursor)
+                    ? class_name_with_double_colons(clang_getCursorSemanticParent(cursor)) : "")
+           + it->second
+           + Libclang::get_display_name(cursor)
+           + "\n";
 }
 
 

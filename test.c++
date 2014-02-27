@@ -131,15 +131,13 @@ void test_member_functions()
             "struct S { void doit() { HERE>; } };\n",
          "struct S\ndoit()\n" /*XXX or "S::doit()\n" ?*/);
 
-#if 0 // XXX
     test("static member function",
             "struct S { static void doit() { HERE>; } };\n",
-         "struct S\nstatic doit()\n"); // Nice to know we're in a static member
+         "struct S\nstatic doit()\n");
 
     test("static member function defined out-of-class",
             "struct S { static void doit(); }; void S::doit() { HERE>; }\n",
-         "static S::doit()\n"); // Nice to know we're in a static member
-#endif
+         "static S::doit()\n");
 
     test("member function declaration",
             "struct S { void HERE>doit(); };\n"
