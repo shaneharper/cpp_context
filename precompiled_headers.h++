@@ -5,7 +5,6 @@
 #include <vector>
 
 // Included from test.c++:
-#include <algorithm>
 #include <atomic>
 #include <iostream>
 #include <mutex>

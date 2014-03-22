@@ -1,5 +1,4 @@
 #include "libclang++.h++"
-#include <algorithm> // for_each
 #include <atomic>
 #include <cstring> // strlen
 #include <iostream>
@@ -243,7 +242,7 @@ int main()
     test_enums();
     test_miscellaneous();
 
-    std::for_each(threads.begin(), threads.end(), [](std::thread& t) { t.join(); });
+    for (auto& thread: threads) { thread.join(); }
 
     if (test_failure_count == 0)
     {
